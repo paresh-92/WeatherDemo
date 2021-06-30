@@ -16,6 +16,7 @@ class WeatherVC: UIViewController {
     var mainDict : [String:Any] = [:]
     var dailyArray : [Any] = []
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         callWeatherAPI()
@@ -45,7 +46,7 @@ extension WeatherVC : UITableViewDelegate,UITableViewDataSource
         let icon = dct1["icon"] as! String
         let url = "http://openweathermap.org/img/wn/" + icon + "@2x.png"
         cell.imgWeather.sd_setImage(with: URL(string: url), placeholderImage: UIImage(named: ""))
-
+        
         return cell
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -71,32 +72,31 @@ extension WeatherVC
     {
         self.activityIndicator.startAnimating()
         let url = URL(string: "https://api.openweathermap.org/data/2.5/onecall?lat=39.96698&lon=-75.17210&exclude=current,minutely,hourly,daily,alerts&appid=5331402505723916a63db7fe55c0f171")
-            URLSession.shared.dataTask(with: url!, completionHandler: {
-                (data, response, error) in
-                DispatchQueue.main.async {
-                    self.activityIndicator.stopAnimating()
-                    self.activityIndicator.isHidden = true
-                }
-                if(error != nil){
-                    print("error")
-                }else{
-                    do{
-                        let json = try JSONSerialization.jsonObject(with: data!, options:.allowFragments) as! [String : AnyObject]
-
-                        self.mainDict = json
-                        let key = self.mainDict.keys
-                        if key.contains("daily")
-                        {
-                            self.dailyArray = self.mainDict["daily"] as! [Any]
-                            DispatchQueue.main.async {
-                                self.tblWeather.reloadData()
-                            }
-                           
+        URLSession.shared.dataTask(with: url!, completionHandler: {
+            (data, response, error) in
+            DispatchQueue.main.async {
+                self.activityIndicator.stopAnimating()
+                self.activityIndicator.isHidden = true
+            }
+            if(error != nil){
+                print("error")
+            }else{
+                do{
+                    let json = try JSONSerialization.jsonObject(with: data!, options:.allowFragments) as! [String : AnyObject]
+                    self.mainDict = json
+                    let key = self.mainDict.keys
+                    if key.contains("daily")
+                    {
+                        self.dailyArray = self.mainDict["daily"] as! [Any]
+                        DispatchQueue.main.async {
+                            self.tblWeather.reloadData()
                         }
-                    }catch let error as NSError{
-                        print(error)
+                        
                     }
+                }catch let error as NSError{
+                    print(error)
                 }
-            }).resume()
+            }
+        }).resume()
     }
 }
